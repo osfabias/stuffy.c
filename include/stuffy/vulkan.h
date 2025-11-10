@@ -25,6 +25,7 @@
 #pragma once
 
 #include <stdint.h>
+
 #include <vulkan/vulkan.h>
 
 #include "stuffy/apidef.h"
@@ -50,29 +51,18 @@ typedef struct
   /* A pointer to an out vulkan surface variable. */
 } VkSurfaceCreateInfo;
 
-/*
-  @brief Vulkan device extension requirements.
-  @details Specifies the list of Vulkan device extensions required for the
-           current platform. These extensions are necessary for proper
-           integration with the windowing system.
-*/
+/* Structure, that holds a list of extensions names and it's count */
 typedef struct
 {
-  /* Number of extension names. */
-  uint32_t count;
-
-  /* Extension names. */
+  uint32_t     count;
   const char **names;
 } VkDeviceExtensions;
 
 /*
-  @brief Required Vulkan device extensions for the current platform.
-  @details This extern variable contains the list of Vulkan device extensions
-           that must be enabled when creating a Vulkan device for the current
-           platform. The extensions vary by platform (e.g., VK_KHR_swapchain
-           on most platforms, platform-specific extensions on others).
+  @brief Returns structure, that holds requirde device extensions
+  @returns Structure that holds info about extensions
 */
-extern const VkDeviceExtensions VK_DEVICE_EXTENSIONS;
+VkDeviceExtensions get_required_vk_device_extensions (void);
 
 /*
   @brief Creates a Vulkan surface from a window.
@@ -86,6 +76,5 @@ extern const VkDeviceExtensions VK_DEVICE_EXTENSIONS;
   @note The created surface must be destroyed using vkDestroySurfaceKHR
         when no longer needed.
 */
-__STUFFY_API__ VkResult create_vk_surface (
-  const VkSurfaceCreateInfo *info, VkSurfaceKHR *surface);
-
+__STUFFY_API__ VkResult
+create_vk_surface (const VkSurfaceCreateInfo *info, VkSurfaceKHR *surface);
