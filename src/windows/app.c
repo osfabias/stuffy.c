@@ -9,17 +9,17 @@
 #include "src/windows/platform_state.h"
 #include "src/windows/window_procedure.h"
 
-inline static HMODULE get_current_module_handle (void);
+inline static HMODULE stuffy__get_current_module_handle (void);
 
-inline static void register_window_class (void);
+inline static void stuffy__register_window_class (void);
 
 WindowsPlatformState g_windows_state = {0};
 
 int32_t stuffy_app_init (void)
 {
-  g_windows_state.module = get_current_module_handle ( );
+  g_windows_state.module = stuffy__get_current_module_handle ( );
 
-  register_window_class ( );
+  stuffy__register_window_class ( );
 
   return 0;
 }
@@ -38,7 +38,7 @@ void stuffy_app_deinit (void)
   UnregisterClass (WINDOW_CLASS_NAME, g_windows_state.module);
 }
 
-HMODULE get_current_module_handle (void)
+HMODULE stuffy__get_current_module_handle (void)
 {
   extern IMAGE_DOS_HEADER __ImageBase;
 
@@ -47,10 +47,10 @@ HMODULE get_current_module_handle (void)
   return module;
 }
 
-void register_window_class (void)
+void stuffy__register_window_class (void)
 {
   WNDCLASS wc = {
-    .lpfnWndProc   = window_procedure,
+    .lpfnWndProc   = stuffy__window_procedure,
     .hInstance     = g_windows_state.module,
     .lpszClassName = WINDOW_CLASS_NAME,
   };

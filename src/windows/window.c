@@ -13,10 +13,10 @@
 #include "src/windows/window.h"
 #include "src/windows/window_procedure.h"
 
-inline static bool  is_window_fullscreen (HWND window);
-inline static void  set_window_fullscreen (StuffyWindow *window, bool fullscreen);
-inline static HWND  open_windows_window (const StuffyWindowConfig *config);
-inline static DWORD translate_style_mask (StuffyWindowStyleMask style_mask);
+inline static bool  stuffy__is_window_fullscreen (HWND window);
+inline static void  stuffy__set_window_fullscreen (StuffyWindow *window, bool fullscreen);
+inline static HWND  stuffy__open_windows_window (const StuffyWindowConfig *config);
+inline static DWORD stuffy__translate_style_mask (StuffyWindowStyleMask style_mask);
 
 StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
 {
@@ -26,7 +26,7 @@ StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
     return NULL;
   }
 
-  window->windows_window = open_windows_window (config);
+  window->windows_window = stuffy__open_windows_window (config);
   if (window->windows_window == NULL)
   {
     goto FAILED_WINDOWS_WINDOW;
@@ -45,7 +45,7 @@ StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
 
   ShowWindow (window->windows_window, SW_SHOW);
 
-  window->window_init_style = translate_style_mask (config->style_mask);
+  window->window_init_style = stuffy__translate_style_mask (config->style_mask);
   window->should_close      = false;
   window->resize_callback   = NULL;
 
@@ -103,7 +103,7 @@ StuffyWindowRect stuffy_window_get_rect (StuffyWindow *window)
 
 void stuffy_window_set_state (StuffyWindow *window, StuffyWindowState state)
 {
-  set_window_fullscreen (window, state == STUFFY_WINDOW_STATE_FULLSCREEN);
+    stuffy__set_window_fullscreen (window, state == STUFFY_WINDOW_STATE_FULLSCREEN);
   if (state == STUFFY_WINDOW_STATE_FULLSCREEN) { return; }
 
   switch (state)
@@ -125,19 +125,19 @@ StuffyWindowState stuffy_window_get_state (StuffyWindow *window)
   {
     return STUFFY_WINDOW_STATE_ICONIFIED;
   }
-  if (is_window_fullscreen (window->windows_window))
+    if (stuffy__is_window_fullscreen (window->windows_window))
   {
     return STUFFY_WINDOW_STATE_FULLSCREEN;
   }
   return STUFFY_WINDOW_STATE_NORMAL;
 }
 
-HWND open_windows_window (const StuffyWindowConfig *config)
+HWND stuffy__open_windows_window (const StuffyWindowConfig *config)
 {
   return CreateWindowEx (0,
     WINDOW_CLASS_NAME,
     config->title,
-    translate_style_mask (config->style_mask),
+    stuffy__translate_style_mask (config->style_mask),
     config->rect.x,
     config->rect.y,
     config->rect.width,
@@ -148,7 +148,7 @@ HWND open_windows_window (const StuffyWindowConfig *config)
     NULL);
 }
 
-DWORD translate_style_mask (StuffyWindowStyleMask style_mask)
+DWORD stuffy__translate_style_mask (StuffyWindowStyleMask style_mask)
 {
   DWORD windows_style_mask = WS_BORDER;
 
@@ -174,7 +174,7 @@ DWORD translate_style_mask (StuffyWindowStyleMask style_mask)
   return windows_style_mask;
 }
 
-void set_window_fullscreen (StuffyWindow *window, bool fullscreen)
+void stuffy__set_window_fullscreen (StuffyWindow *window, bool fullscreen)
 {
   if (fullscreen)
   {
@@ -199,7 +199,7 @@ void set_window_fullscreen (StuffyWindow *window, bool fullscreen)
   }
 }
 
-bool is_window_fullscreen (HWND window)
+bool stuffy__is_window_fullscreen (HWND window)
 {
   MONITORINFO monitor_info = {0};
   monitor_info.cbSize      = sizeof (MONITORINFO);

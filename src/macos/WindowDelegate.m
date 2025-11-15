@@ -1,9 +1,15 @@
 #import <Cocoa/Cocoa.h>
+#import <CoreGraphics/CoreGraphics.h>
 
 #import "stuffy/window.h"
 
 #import "src/macos/Window.h"
 #import "src/macos/WindowDelegate.h"
+
+static float stuffy__transform_y (float value)
+{
+  return CGDisplayBounds (CGMainDisplayID ( )).size.height - value - 1;
+}
 
 @implementation WindowDelegate
 
@@ -48,11 +54,13 @@
   if (self.stuffyWindow && self.stuffyWindow->resize_callback)
   {
     const NSRect content_rect = [self.stuffyWindow->ns_window contentRectForFrameRect:[self.stuffyWindow->ns_window frame]];
-    self.stuffyWindow->resize_callback (
-      self.stuffyWindow,
-      (uint32_t)content_rect.size.width,
-      (uint32_t)content_rect.size.height
-    );
+    const StuffyWindowRect rect = {
+      .x      = (int32_t)content_rect.origin.x,
+      .y      = (int32_t)stuffy__transform_y (content_rect.origin.y + content_rect.size.height - 1),
+      .width  = (uint32_t)content_rect.size.width,
+      .height = (uint32_t)content_rect.size.height,
+    };
+    self.stuffyWindow->resize_callback (self.stuffyWindow, rect);
   }
 }
 

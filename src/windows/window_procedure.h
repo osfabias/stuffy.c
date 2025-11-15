@@ -11,7 +11,7 @@
 #include "src/windows/names.h"
 #include "src/windows/window.h"
 
-static LRESULT CALLBACK window_procedure (
+static LRESULT CALLBACK stuffy__window_procedure (
   HWND window, UINT message_code, WPARAM wparam, LPARAM lparam)
 {
   switch (message_code)
@@ -63,9 +63,15 @@ static LRESULT CALLBACK window_procedure (
     StuffyWindow *stuffy_window = GetProp (window, WINDOW_PROPERTY_NAME);
     if (stuffy_window && stuffy_window->resize_callback)
     {
-      const uint32_t width  = (uint32_t)LOWORD (lparam);
-      const uint32_t height = (uint32_t)HIWORD (lparam);
-      stuffy_window->resize_callback (stuffy_window, width, height);
+      RECT rect;
+      GetWindowRect (window, &rect);
+      const StuffyWindowRect window_rect = {
+        .x      = (int32_t)rect.left,
+        .y      = (int32_t)rect.top,
+        .width  = (uint32_t)(rect.right - rect.left),
+        .height = (uint32_t)(rect.bottom - rect.top),
+      };
+      stuffy_window->resize_callback (stuffy_window, window_rect);
     }
     break;
   }

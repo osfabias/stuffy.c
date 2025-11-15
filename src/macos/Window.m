@@ -8,25 +8,25 @@
 #import "src/macos/Window.h"
 #import "src/macos/WindowDelegate.h"
 
-inline static StuffyWindow        *alloc_window_struct (void);
-inline static WindowDelegate *alloc_window_delegate (StuffyWindow *);
-inline static ContentView    *alloc_content_view (StuffyWindow *);
-inline static NSWindow       *alloc_ns_window (const StuffyWindowConfig *);
-inline static CAMetalLayer   *alloc_metal_layer (ContentView *);
-inline static float           transform_y (float);
+inline static StuffyWindow        *stuffy__alloc_window_struct (void);
+inline static WindowDelegate *stuffy__alloc_window_delegate (StuffyWindow *);
+inline static ContentView    *stuffy__alloc_content_view (StuffyWindow *);
+inline static NSWindow       *stuffy__alloc_ns_window (const StuffyWindowConfig *);
+inline static CAMetalLayer   *stuffy__alloc_metal_layer (ContentView *);
+static float stuffy__transform_y (float);
 
 StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
 {
-  StuffyWindow *window = alloc_window_struct ( );
+  StuffyWindow *window = stuffy__alloc_window_struct ( );
   if (!window) { return NULL; }
 
-  window->window_delegate = alloc_window_delegate (window);
+  window->window_delegate = stuffy__alloc_window_delegate (window);
   if (!window->window_delegate) { goto FAILED_WINDOW_DELEGATE; }
 
-  window->content_view = alloc_content_view (window);
+  window->content_view = stuffy__alloc_content_view (window);
   if (!window->content_view) { goto FAILED_INIT_CONTENT_VIEW; }
 
-  window->ns_window = alloc_ns_window (config);
+  window->ns_window = stuffy__alloc_ns_window (config);
   if (!window->ns_window) { goto FAILED_INIT_NS_WINDOW; }
   [window->ns_window setDelegate:window->window_delegate];
   [window->ns_window setContentView:window->content_view];
@@ -37,7 +37,7 @@ StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
                                                  name:NSWindowDidResizeNotification
                                                object:window->ns_window];
 
-  window->metal_layer = alloc_metal_layer (window->content_view);
+  window->metal_layer = stuffy__alloc_metal_layer (window->content_view);
 
   return window;
 
@@ -101,7 +101,7 @@ void stuffy_window_set_rect (StuffyWindow *window, StuffyWindowRect rect)
   {
     NSRect ns_rect = [window->ns_window contentRectForFrameRect:[window->ns_window frame]];
     ns_rect.origin.x = rect.x;
-    ns_rect.origin.y = transform_y (rect.y + rect.height - 1);
+    ns_rect.origin.y = stuffy__transform_y (rect.y + rect.height - 1);
     ns_rect.size.width = rect.width;
     ns_rect.size.height = rect.height;
     [window->ns_window setFrame:[window->ns_window frameRectForContentRect:ns_rect]
@@ -117,7 +117,7 @@ StuffyWindowRect stuffy_window_get_rect (StuffyWindow *window)
 
     StuffyWindowRect window_rect = {
       .x = (int32_t)rect.origin.x,
-      .y = (int32_t)transform_y (rect.origin.y + rect.size.height - 1),
+      .y = (int32_t)stuffy__transform_y (rect.origin.y + rect.size.height - 1),
       .width = (uint32_t)rect.size.width,
       .height = (uint32_t)rect.size.height,
     };
@@ -163,7 +163,7 @@ void stuffy_window_set_resize_callback (
   window->resize_callback = callback;
 }
 
-StuffyWindow *alloc_window_struct (void)
+StuffyWindow *stuffy__alloc_window_struct (void)
 {
   StuffyWindow *const window = malloc (sizeof (StuffyWindow));
   if (!window)
@@ -179,7 +179,7 @@ StuffyWindow *alloc_window_struct (void)
   return window;
 }
 
-WindowDelegate *alloc_window_delegate (StuffyWindow *window)
+WindowDelegate *stuffy__alloc_window_delegate (StuffyWindow *window)
 {
   WindowDelegate *delegate = [WindowDelegate alloc];
   delegate = [delegate initWithWindow:window];
@@ -191,12 +191,12 @@ WindowDelegate *alloc_window_delegate (StuffyWindow *window)
   return delegate;
 }
 
-NSWindow *alloc_ns_window (const StuffyWindowConfig *config)
+NSWindow *stuffy__alloc_ns_window (const StuffyWindowConfig *config)
 {
   @autoreleasepool
   {
     const NSRect ns_window_rect = NSMakeRect (config->rect.x,
-      transform_y (config->rect.y + config->rect.height - 1), config->rect.width,
+      stuffy__transform_y (config->rect.y + config->rect.height - 1), config->rect.width,
       config->rect.height);
 
     NSWindow *ns_window = [NSWindow alloc];
@@ -224,7 +224,7 @@ NSWindow *alloc_ns_window (const StuffyWindowConfig *config)
   }  // autoreleasepool
 }
 
-ContentView *alloc_content_view (StuffyWindow *window)
+ContentView *stuffy__alloc_content_view (StuffyWindow *window)
 {
   ContentView *view = [ContentView alloc];
   view = [view initWithWindow:window];
@@ -238,7 +238,7 @@ ContentView *alloc_content_view (StuffyWindow *window)
   return view;
 }
 
-CAMetalLayer *alloc_metal_layer (ContentView *view)
+CAMetalLayer *stuffy__alloc_metal_layer (ContentView *view)
 {
   CAMetalLayer *layer = [CAMetalLayer layer];
 
@@ -273,7 +273,7 @@ CAMetalLayer *alloc_metal_layer (ContentView *view)
   return layer;
 }
 
-float transform_y (float value)
+static float stuffy__transform_y (float value)
 {
   return CGDisplayBounds (CGMainDisplayID ( )).size.height - value - 1;
 }

@@ -4,7 +4,7 @@
 
 #import "src/macos/AppDelegate.h"
 
-inline static AppDelegate *alloc_app_delegate (void);
+inline static AppDelegate *stuffy__alloc_app_delegate (void);
 
 static struct
 {
@@ -22,7 +22,7 @@ int32_t stuffy_app_init (void)
   // Create shared application instance (further 'NSApp')
   [NSApplication sharedApplication];
 
-  g_app_state.app_delegate = alloc_app_delegate ( );
+  g_app_state.app_delegate = stuffy__alloc_app_delegate ( );
   if (!g_app_state.app_delegate) { return 1; }
   [NSApp setDelegate:g_app_state.app_delegate];
 
@@ -67,7 +67,7 @@ void stuffy_app_deinit (void)
   g_app_state.initialized = 0;
 }
 
-AppDelegate *alloc_app_delegate (void)
+AppDelegate *stuffy__alloc_app_delegate (void)
 {
   AppDelegate *delegate = [AppDelegate alloc];
   delegate = [delegate init];

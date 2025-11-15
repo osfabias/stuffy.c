@@ -37,14 +37,12 @@
   @brief Window resize callback function.
   @details This callback is invoked whenever the window is resized.
   @param window Pointer to the window that was resized.
-  @param width New width of the window in pixels.
-  @param height New height of the window in pixels.
+  @param rect New window rectangle containing position and size in screen coordinates.
 */
-static void on_window_resize (
-  StuffyWindow *window, uint32_t width, uint32_t height)
+static void on_window_resize (StuffyWindow *window, StuffyWindowRect rect)
 {
   (void)window; // Unused parameter
-  printf ("Window resized to %ux%u\n", width, height);
+  printf ("Window resized: position (%d, %d), size %ux%u\n", rect.x, rect.y, rect.width, rect.height);
 }
 
 int main (void)

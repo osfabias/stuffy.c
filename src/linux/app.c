@@ -11,7 +11,7 @@
 #include "src/linux/platform_state.h"
 #include "src/linux/window.h"
 
-inline static void process_client_message_event (XClientMessageEvent *event);
+inline static void stuffy__process_client_message_event (XClientMessageEvent *event);
 
 LinuxPlatformState g_linux_state = {
   .initialized = false,
@@ -64,10 +64,10 @@ void stuffy_app_update (void)
       g_mouse_state.y = (int32_t)event.xbutton.y;
       break;
     case ClientMessage :
-      process_client_message_event (&event.xclient);
+      stuffy__process_client_message_event (&event.xclient);
       break;
     case ConfigureNotify :
-      process_configure_notify_event (&event.xconfigure);
+      stuffy__process_configure_notify_event (&event.xconfigure);
       break;
     default :
       break;
@@ -86,7 +86,7 @@ void stuffy_app_deinit (void)
   g_linux_state.initialized = false;
 }
 
-void process_client_message_event (XClientMessageEvent *p_event)
+void stuffy__process_client_message_event (XClientMessageEvent *p_event)
 {
   Atom delete_window_atom = XInternAtom (g_linux_state.display, "WM_DELETE_WINDOW", False);
   if ((Atom)p_event->data.l[ 0 ] == delete_window_atom)
@@ -119,9 +119,9 @@ void process_client_message_event (XClientMessageEvent *p_event)
   }
 }
 
-inline static void process_configure_notify_event (XConfigureEvent *event);
+inline static void stuffy__process_configure_notify_event (XConfigureEvent *event);
 
-inline static void process_configure_notify_event (XConfigureEvent *event)
+inline static void stuffy__process_configure_notify_event (XConfigureEvent *event)
 {
   unsigned char *prop_data = NULL;
   unsigned long  nitems, bytes_after;
@@ -146,9 +146,13 @@ inline static void process_configure_notify_event (XConfigureEvent *event)
       StuffyWindow *window = *(StuffyWindow **)prop_data;
       if (window && window->resize_callback)
       {
-        window->resize_callback (
-          window, (uint32_t)event->width, (uint32_t)event->height
-        );
+        const StuffyWindowRect rect = {
+          .x      = event->x,
+          .y      = event->y,
+          .width  = (uint32_t)event->width,
+          .height = (uint32_t)event->height,
+        };
+        window->resize_callback (window, rect);
       }
       XFree (prop_data);
     }

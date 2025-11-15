@@ -14,7 +14,7 @@
 #include "src/linux/platform_state.h"
 #include "src/linux/window.h"
 
-inline static void send_x11_window_fullscreen_switch_event (XID x11_window, int32_t state);
+inline static void stuffy__send_x11_window_fullscreen_switch_event (XID x11_window, int32_t state);
 
 StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
 {
@@ -157,13 +157,13 @@ void stuffy_window_set_state (StuffyWindow *window, StuffyWindowState state)
   switch (state)
   {
   case STUFFY_WINDOW_STATE_FULLSCREEN :
-    send_x11_window_fullscreen_switch_event (window->x11_window, 1);
+    stuffy__send_x11_window_fullscreen_switch_event (window->x11_window, 1);
     break;
   case STUFFY_WINDOW_STATE_ICONIFIED :
     XIconifyWindow (g_linux_state.display, window->x11_window, g_linux_state.screen_index);
     break;
   case STUFFY_WINDOW_STATE_NORMAL :
-    send_x11_window_fullscreen_switch_event (window->x11_window, 0);
+    stuffy__send_x11_window_fullscreen_switch_event (window->x11_window, 0);
     break;
   default :
     return;
@@ -212,7 +212,7 @@ StuffyWindowState stuffy_window_get_state (StuffyWindow *window)
   return STUFFY_WINDOW_STATE_NORMAL;
 }
 
-void send_x11_window_fullscreen_switch_event (XID x11_window, int32_t state)
+void stuffy__send_x11_window_fullscreen_switch_event (XID x11_window, int32_t state)
 {
   Atom net_wm_state_atom = XInternAtom (g_linux_state.display, "_NET_WM_STATE", False);
   Atom fullscreen        = XInternAtom (g_linux_state.display, "_NET_WM_STATE_FULLSCREEN", False);

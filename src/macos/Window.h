@@ -16,6 +16,6 @@ struct StuffyWindow
   CAMetalLayer      *metal_layer;
   StuffyWindowState state;
   BOOL               should_close;
-  void (*resize_callback) (struct StuffyWindow *, uint32_t, uint32_t);
+  void (*resize_callback) (struct StuffyWindow *, StuffyWindowRect);
 };
 
