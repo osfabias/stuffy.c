@@ -58,6 +58,23 @@ static LRESULT CALLBACK stuffy__window_procedure (
   case WM_MBUTTONUP :
     g_mouse_state.buttons[ STUFFY_MOUSE_BUTTON_MIDDLE ] = 0;
     break;
+  case WM_MOVE :
+  {
+    StuffyWindow *stuffy_window = GetProp (window, WINDOW_PROPERTY_NAME);
+    if (stuffy_window && stuffy_window->move_callback)
+    {
+      RECT rect;
+      GetWindowRect (window, &rect);
+      const StuffyWindowRect window_rect = {
+        .x      = (int32_t)rect.left,
+        .y      = (int32_t)rect.top,
+        .width  = (uint32_t)(rect.right - rect.left),
+        .height = (uint32_t)(rect.bottom - rect.top),
+      };
+      stuffy_window->move_callback (stuffy_window, window_rect);
+    }
+    break;
+  }
   case WM_SIZE :
   {
     StuffyWindow *stuffy_window = GetProp (window, WINDOW_PROPERTY_NAME);

@@ -45,6 +45,18 @@ static void on_window_resize (StuffyWindow *window, StuffyWindowRect rect)
   printf ("Window resized: position (%d, %d), size %ux%u\n", rect.x, rect.y, rect.width, rect.height);
 }
 
+/*
+  @brief Window move callback function.
+  @details This callback is invoked whenever the window is moved.
+  @param window Pointer to the window that was moved.
+  @param rect New window rectangle containing position and size in screen coordinates.
+*/
+static void on_window_move (StuffyWindow *window, StuffyWindowRect rect)
+{
+  (void)window; // Unused parameter
+  printf ("Window moved: position (%d, %d), size %ux%u\n", rect.x, rect.y, rect.width, rect.height);
+}
+
 int main (void)
 {
   // Initialize application
@@ -74,9 +86,13 @@ int main (void)
   printf ("Window opened successfully!\n");
   printf ("Press ESC to close the window\n");
   printf ("Try resizing the window to see the resize callback in action\n");
+  printf ("Try moving the window to see the move callback in action\n");
 
   // Set window resize callback
   stuffy_window_set_resize_callback (window, on_window_resize);
+
+  // Set window move callback
+  stuffy_window_set_move_callback (window, on_window_move);
 
   // Main loop
   while (!stuffy_window_should_close (window))

@@ -48,6 +48,7 @@ StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
   window->window_init_style = stuffy__translate_style_mask (config->style_mask);
   window->should_close      = false;
   window->resize_callback   = NULL;
+  window->move_callback     = NULL;
 
   return window;
 
@@ -219,5 +220,12 @@ void stuffy_window_set_resize_callback (
 {
   if (window == NULL) { return; }
   window->resize_callback = callback;
+}
+
+void stuffy_window_set_move_callback (
+  StuffyWindow *window, StuffyWindowMoveCallback callback)
+{
+  if (window == NULL) { return; }
+  window->move_callback = callback;
 }
 

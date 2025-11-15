@@ -36,6 +36,10 @@ StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
                                              selector:@selector(windowDidResize:)
                                                  name:NSWindowDidResizeNotification
                                                object:window->ns_window];
+  [[NSNotificationCenter defaultCenter] addObserver:window->window_delegate
+                                             selector:@selector(windowDidMove:)
+                                                 name:NSWindowDidMoveNotification
+                                               object:window->ns_window];
 
   window->metal_layer = stuffy__alloc_metal_layer (window->content_view);
 
@@ -60,6 +64,9 @@ void stuffy_window_close (StuffyWindow *window)
 
   [[NSNotificationCenter defaultCenter] removeObserver:window->window_delegate
                                                     name:NSWindowDidResizeNotification
+                                                  object:window->ns_window];
+  [[NSNotificationCenter defaultCenter] removeObserver:window->window_delegate
+                                                    name:NSWindowDidMoveNotification
                                                   object:window->ns_window];
 
   [window->ns_window setContentView:nil];
@@ -163,6 +170,13 @@ void stuffy_window_set_resize_callback (
   window->resize_callback = callback;
 }
 
+void stuffy_window_set_move_callback (
+  StuffyWindow *window, StuffyWindowMoveCallback callback)
+{
+  if (window == NULL) { return; }
+  window->move_callback = callback;
+}
+
 StuffyWindow *stuffy__alloc_window_struct (void)
 {
   StuffyWindow *const window = malloc (sizeof (StuffyWindow));
@@ -174,6 +188,7 @@ StuffyWindow *stuffy__alloc_window_struct (void)
   *window = (StuffyWindow) {
     .state = STUFFY_WINDOW_STATE_NORMAL,
     .resize_callback = NULL,
+    .move_callback = NULL,
   };
 
   return window;

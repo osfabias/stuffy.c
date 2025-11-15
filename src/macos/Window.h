@@ -17,5 +17,6 @@ struct StuffyWindow
   StuffyWindowState state;
   BOOL               should_close;
   void (*resize_callback) (struct StuffyWindow *, StuffyWindowRect);
+  void (*move_callback) (struct StuffyWindow *, StuffyWindowRect);
 };
 

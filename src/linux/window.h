@@ -11,5 +11,6 @@ struct StuffyWindow
   XID  x11_window;
   bool should_close;
   void (*resize_callback) (struct StuffyWindow *, StuffyWindowRect);
+  void (*move_callback) (struct StuffyWindow *, StuffyWindowRect);
 };
 

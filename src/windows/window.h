@@ -10,5 +10,6 @@ struct StuffyWindow
   LONG window_init_style;
   bool should_close;
   void (*resize_callback) (struct StuffyWindow *, StuffyWindowRect);
+  void (*move_callback) (struct StuffyWindow *, StuffyWindowRect);
 };
 

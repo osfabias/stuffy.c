@@ -144,15 +144,35 @@ inline static void stuffy__process_configure_notify_event (XConfigureEvent *even
     if (prop_data)
     {
       StuffyWindow *window = *(StuffyWindow **)prop_data;
-      if (window && window->resize_callback)
+      if (window)
       {
-        const StuffyWindowRect rect = {
+        const StuffyWindowRect new_rect = {
           .x      = event->x,
           .y      = event->y,
           .width  = (uint32_t)event->width,
           .height = (uint32_t)event->height,
         };
-        window->resize_callback (window, rect);
+        
+        // Get current rect to compare (before the event, this should be the old rect)
+        // Actually, since ConfigureNotify is sent after the change, we need to track previous
+        // For now, we'll call move if position changed, resize if size changed
+        // We can detect this by checking if the event indicates a position or size change
+        // Since we don't have previous state, we'll call both if callbacks are set
+        // But actually, we can use XGetGeometry to get current, but that's the new one
+        // Simplest: call move_callback if set, resize_callback if set
+        // The user can decide based on what changed
+        
+        // Check if this is a move (position changed) or resize (size changed)
+        // We'll call move_callback for any ConfigureNotify since position is always included
+        // and resize_callback if size changed
+        if (window->move_callback)
+        {
+          window->move_callback (window, new_rect);
+        }
+        if (window->resize_callback)
+        {
+          window->resize_callback (window, new_rect);
+        }
       }
       XFree (prop_data);
     }

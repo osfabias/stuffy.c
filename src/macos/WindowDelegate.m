@@ -64,5 +64,20 @@ static float stuffy__transform_y (float value)
   }
 }
 
+- (void)windowDidMove:(NSNotification *)notification
+{
+  if (self.stuffyWindow && self.stuffyWindow->move_callback)
+  {
+    const NSRect content_rect = [self.stuffyWindow->ns_window contentRectForFrameRect:[self.stuffyWindow->ns_window frame]];
+    const StuffyWindowRect rect = {
+      .x      = (int32_t)content_rect.origin.x,
+      .y      = (int32_t)stuffy__transform_y (content_rect.origin.y + content_rect.size.height - 1),
+      .width  = (uint32_t)content_rect.size.width,
+      .height = (uint32_t)content_rect.size.height,
+    };
+    self.stuffyWindow->move_callback (self.stuffyWindow, rect);
+  }
+}
+
 @end
 

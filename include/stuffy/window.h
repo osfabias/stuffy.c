@@ -101,6 +101,17 @@ typedef void (*StuffyWindowResizeCallback) (
 );
 
 /*
+  @brief Callback function type for window move events.
+  @details This callback is invoked when the window position changes. The callback
+           receives the new window rectangle (position and size).
+  @param window Pointer to the StuffyWindow instance that was moved.
+  @param rect New window rectangle containing position and size in screen coordinates.
+*/
+typedef void (*StuffyWindowMoveCallback) (
+  StuffyWindow *window, StuffyWindowRect rect
+);
+
+/*
   @brief Opens a window.
   @details Creates and displays a new window based on the provided configuration.
            The window is created with the specified title, size, position, and
@@ -194,5 +205,17 @@ __STUFFY_API__ StuffyWindowState stuffy_window_get_state (StuffyWindow *window);
 */
 __STUFFY_API__ void stuffy_window_set_resize_callback (
   StuffyWindow *window, StuffyWindowResizeCallback callback
+);
+
+/*
+  @brief Sets a callback function to be invoked when the window is moved.
+  @details The callback will be called whenever the window position changes.
+           The callback receives the complete window rectangle including position and size.
+  @param window Pointer to the StuffyWindow instance (must not be NULL).
+  @param callback Function pointer to the callback, or NULL to remove the callback.
+  @note The callback is invoked on the main thread during event processing.
+*/
+__STUFFY_API__ void stuffy_window_set_move_callback (
+  StuffyWindow *window, StuffyWindowMoveCallback callback
 );
 
