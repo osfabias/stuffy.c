@@ -21,16 +21,10 @@ inline static DWORD stuffy__translate_style_mask (StuffyWindowStyleMask style_ma
 StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
 {
   StuffyWindow *window = malloc (sizeof (StuffyWindow));
-  if (window == NULL)
-  {
-    return NULL;
-  }
+  if (window == NULL) { return NULL; }
 
   window->windows_window = stuffy__open_windows_window (config);
-  if (window->windows_window == NULL)
-  {
-    goto FAILED_WINDOWS_WINDOW;
-  }
+  if (window->windows_window == NULL) { goto FAILED_WINDOWS_WINDOW; }
 
   if (SetProp (window->windows_window, WINDOW_PROPERTY_NAME, window) == FALSE)
   {
@@ -39,8 +33,10 @@ StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
 
   if (!(config->style_mask & STUFFY_WINDOW_STYLE_CLOSABLE_BIT))
   {
-    EnableMenuItem (GetSystemMenu (window->windows_window, FALSE), SC_CLOSE,
-      MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+    EnableMenuItem (
+      GetSystemMenu (window->windows_window, FALSE), SC_CLOSE,
+      MF_BYCOMMAND | MF_DISABLED | MF_GRAYED
+    );
   }
 
   ShowWindow (window->windows_window, SW_SHOW);
@@ -102,9 +98,32 @@ StuffyWindowRect stuffy_window_get_rect (StuffyWindow *window)
   return window_rect;
 }
 
+StuffyExtent2D stuffy_window_get_framebuffer_size (StuffyWindow *window)
+{
+  RECT client_rect;
+  GetClientRect (window->windows_window, &client_rect);
+
+  // Get DPI scaling factor
+  const HDC hdc   = GetDC (window->windows_window);
+  const int dpi_x = GetDeviceCaps (hdc, LOGPIXELSX);
+  const int dpi_y = GetDeviceCaps (hdc, LOGPIXELSY);
+  ReleaseDC (window->windows_window, hdc);
+
+  // Standard DPI is 96, calculate scaling factor
+  const float scale_x = (float)dpi_x / 96.0f;
+  const float scale_y = (float)dpi_y / 96.0f;
+
+  StuffyExtent2D extent = {
+    .width  = (uint32_t)((client_rect.right - client_rect.left) * scale_x),
+    .height = (uint32_t)((client_rect.bottom - client_rect.top) * scale_y),
+  };
+
+  return extent;
+}
+
 void stuffy_window_set_state (StuffyWindow *window, StuffyWindowState state)
 {
-    stuffy__set_window_fullscreen (window, state == STUFFY_WINDOW_STATE_FULLSCREEN);
+  stuffy__set_window_fullscreen (window, state == STUFFY_WINDOW_STATE_FULLSCREEN);
   if (state == STUFFY_WINDOW_STATE_FULLSCREEN) { return; }
 
   switch (state)
@@ -122,11 +141,8 @@ void stuffy_window_set_state (StuffyWindow *window, StuffyWindowState state)
 
 StuffyWindowState stuffy_window_get_state (StuffyWindow *window)
 {
-  if (IsIconic (window->windows_window))
-  {
-    return STUFFY_WINDOW_STATE_ICONIFIED;
-  }
-    if (stuffy__is_window_fullscreen (window->windows_window))
+  if (IsIconic (window->windows_window)) { return STUFFY_WINDOW_STATE_ICONIFIED; }
+  if (stuffy__is_window_fullscreen (window->windows_window))
   {
     return STUFFY_WINDOW_STATE_FULLSCREEN;
   }
@@ -135,18 +151,11 @@ StuffyWindowState stuffy_window_get_state (StuffyWindow *window)
 
 HWND stuffy__open_windows_window (const StuffyWindowConfig *config)
 {
-  return CreateWindowEx (0,
-    WINDOW_CLASS_NAME,
-    config->title,
-    stuffy__translate_style_mask (config->style_mask),
-    config->rect.x,
-    config->rect.y,
-    config->rect.width,
-    config->rect.height,
-    NULL,
-    NULL,
-    g_windows_state.module,
-    NULL);
+  return CreateWindowEx (
+    0, WINDOW_CLASS_NAME, config->title,
+    stuffy__translate_style_mask (config->style_mask), config->rect.x, config->rect.y,
+    config->rect.width, config->rect.height, NULL, NULL, g_windows_state.module, NULL
+  );
 }
 
 DWORD stuffy__translate_style_mask (StuffyWindowStyleMask style_mask)
@@ -157,8 +166,7 @@ DWORD stuffy__translate_style_mask (StuffyWindowStyleMask style_mask)
   {
     windows_style_mask |= WS_CAPTION | WS_SYSMENU;
   }
-  else
-  {
+  else {
     windows_style_mask |= WS_POPUP;
   }
 
@@ -179,23 +187,24 @@ void stuffy__set_window_fullscreen (StuffyWindow *window, bool fullscreen)
 {
   if (fullscreen)
   {
-    SetWindowLong (window->windows_window, GWL_STYLE,
-      window->window_init_style & ~(WS_CAPTION | WS_THICKFRAME));
+    SetWindowLong (
+      window->windows_window, GWL_STYLE,
+      window->window_init_style & ~(WS_CAPTION | WS_THICKFRAME)
+    );
 
     MONITORINFO monitor_info = {0};
     monitor_info.cbSize      = sizeof (MONITORINFO);
-    GetMonitorInfo (MonitorFromWindow (window->windows_window, MONITOR_DEFAULTTOPRIMARY),
-      &monitor_info);
+    GetMonitorInfo (
+      MonitorFromWindow (window->windows_window, MONITOR_DEFAULTTOPRIMARY), &monitor_info
+    );
 
-    MoveWindow (window->windows_window,
-      monitor_info.rcMonitor.left,
-      monitor_info.rcMonitor.top,
+    MoveWindow (
+      window->windows_window, monitor_info.rcMonitor.left, monitor_info.rcMonitor.top,
       monitor_info.rcMonitor.right - monitor_info.rcMonitor.left,
-      monitor_info.rcMonitor.bottom - monitor_info.rcMonitor.top,
-      TRUE);
+      monitor_info.rcMonitor.bottom - monitor_info.rcMonitor.top, TRUE
+    );
   }
-  else
-  {
+  else {
     SetWindowLong (window->windows_window, GWL_STYLE, window->window_init_style);
   }
 }
@@ -216,16 +225,17 @@ bool stuffy__is_window_fullscreen (HWND window)
 }
 
 void stuffy_window_set_resize_callback (
-  StuffyWindow *window, StuffyWindowResizeCallback callback)
+  StuffyWindow *window, StuffyWindowResizeCallback callback
+)
 {
   if (window == NULL) { return; }
   window->resize_callback = callback;
 }
 
 void stuffy_window_set_move_callback (
-  StuffyWindow *window, StuffyWindowMoveCallback callback)
+  StuffyWindow *window, StuffyWindowMoveCallback callback
+)
 {
   if (window == NULL) { return; }
   window->move_callback = callback;
 }
-

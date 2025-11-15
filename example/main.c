@@ -24,6 +24,7 @@
           library usage.
 */
 
+#include "stuffy/extent.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,6 +34,12 @@
 #include <stuffy/input/mouse.h>
 #include <stuffy/window.h>
 
+static void print_window_resolution (StuffyWindow *window)
+{
+  const StuffyExtent2D resolution = stuffy_window_get_framebuffer_size (window);
+  printf ("Window resolution: %ux%u\n", resolution.width, resolution.height);
+}
+
 /*
   @brief Window resize callback function.
   @details This callback is invoked whenever the window is resized.
@@ -41,8 +48,9 @@
 */
 static void on_window_resize (StuffyWindow *window, StuffyWindowRect rect)
 {
-  (void)window; // Unused parameter
-  printf ("Window resized: position (%d, %d), size %ux%u\n", rect.x, rect.y, rect.width, rect.height);
+  (void)window;  // Unused parameter
+  printf ("Window resized: size %ux%u\n", rect.width, rect.height);
+  print_window_resolution (window);
 }
 
 /*
@@ -53,8 +61,8 @@ static void on_window_resize (StuffyWindow *window, StuffyWindowRect rect)
 */
 static void on_window_move (StuffyWindow *window, StuffyWindowRect rect)
 {
-  (void)window; // Unused parameter
-  printf ("Window moved: position (%d, %d), size %ux%u\n", rect.x, rect.y, rect.width, rect.height);
+  (void)window;  // Unused parameter
+  printf ("Window moved: position size %ux%u\n", rect.width, rect.height);
 }
 
 int main (void)
@@ -102,22 +110,11 @@ int main (void)
 
     // Get input states
     const StuffyKeyboardState *keyboard = stuffy_keyboard_get_state ( );
-    const StuffyMouseState    *mouse    = stuffy_mouse_get_state ( );
+
+    // Get window resolution
 
     // Check for ESC key to close window
     if (keyboard->keys[ STUFFY_KEY_ESCAPE ]) { break; }
-
-    // Example: Print mouse position when mouse moves
-    static int32_t last_x = -1, last_y = -1;
-    if (mouse->x != last_x || mouse->y != last_y)
-    {
-      last_x = mouse->x;
-      last_y = mouse->y;
-      printf ("Mouse position: (%d, %d)\n", mouse->x, mouse->y);
-    }
-
-    // Example: Print when mouse buttons are pressed
-    if (mouse->buttons[ STUFFY_MOUSE_BUTTON_LEFT ]) { puts ("Left mouse button pressed"); }
   }
 
   // Cleanup

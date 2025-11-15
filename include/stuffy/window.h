@@ -28,6 +28,7 @@
 #include <stdint.h>
 
 #include "stuffy/apidef.h"
+#include "stuffy/extent.h"
 
 typedef enum
 {
@@ -67,8 +68,8 @@ typedef enum
 */
 typedef struct
 {
-  int32_t x, y;              // Position in screen coordinates.
-  uint32_t width, height; // Size in screen coordinates.
+  int32_t  x, y;           // Position in screen coordinates.
+  uint32_t width, height;  // Size in screen coordinates.
 } StuffyWindowRect;
 
 /*
@@ -77,9 +78,9 @@ typedef struct
 */
 typedef struct
 {
-  const char                *title;
-  StuffyWindowRect           rect;      // Window rectangle in screen coordinates.
-  StuffyWindowStyleMask      style_mask;
+  const char           *title;
+  StuffyWindowRect      rect;  // Window rectangle in screen coordinates.
+  StuffyWindowStyleMask style_mask;
 } StuffyWindowConfig;
 
 /*
@@ -96,9 +97,7 @@ typedef struct StuffyWindow StuffyWindow;
   @param window Pointer to the StuffyWindow instance that was resized.
   @param rect New window rectangle containing position and size in screen coordinates.
 */
-typedef void (*StuffyWindowResizeCallback) (
-  StuffyWindow *window, StuffyWindowRect rect
-);
+typedef void (*StuffyWindowResizeCallback) (StuffyWindow *window, StuffyWindowRect rect);
 
 /*
   @brief Callback function type for window move events.
@@ -107,9 +106,7 @@ typedef void (*StuffyWindowResizeCallback) (
   @param window Pointer to the StuffyWindow instance that was moved.
   @param rect New window rectangle containing position and size in screen coordinates.
 */
-typedef void (*StuffyWindowMoveCallback) (
-  StuffyWindow *window, StuffyWindowRect rect
-);
+typedef void (*StuffyWindowMoveCallback) (StuffyWindow *window, StuffyWindowRect rect);
 
 /*
   @brief Opens a window.
@@ -178,12 +175,26 @@ __STUFFY_API__ void stuffy_window_set_rect (StuffyWindow *window, StuffyWindowRe
 __STUFFY_API__ StuffyWindowRect stuffy_window_get_rect (StuffyWindow *window);
 
 /*
+  @brief Returns the framebuffer extent of the window.
+  @details Retrieves the actual pixel resolution of the window's framebuffer.
+           On high-DPI displays, this may differ from the window size returned by
+           @ref stuffy_window_get_rect. This is the resolution that should be used
+           for rendering operations.
+  @param window Pointer to the StuffyWindow instance (must not be NULL).
+  @return Extent containing the framebuffer width and height in pixels.
+  @note On displays with pixel scaling (e.g., Retina displays), the framebuffer
+        extent will be larger than the logical window size.
+*/
+__STUFFY_API__ StuffyExtent2D stuffy_window_get_framebuffer_size (StuffyWindow *window);
+
+/*
   @brief Sets the window state.
   @details Changes the window's state (normal, iconified, or fullscreen).
   @param window Pointer to the StuffyWindow instance (must not be NULL).
   @param state New window state to apply.
 */
-__STUFFY_API__ void stuffy_window_set_state (StuffyWindow *window, StuffyWindowState state);
+__STUFFY_API__ void
+stuffy_window_set_state (StuffyWindow *window, StuffyWindowState state);
 
 /*
   @brief Returns the current window state.
@@ -210,12 +221,11 @@ __STUFFY_API__ void stuffy_window_set_resize_callback (
 /*
   @brief Sets a callback function to be invoked when the window is moved.
   @details The callback will be called whenever the window position changes.
-           The callback receives the complete window rectangle including position and size.
+           The callback receives the complete window rectangle including position and
+  size.
   @param window Pointer to the StuffyWindow instance (must not be NULL).
   @param callback Function pointer to the callback, or NULL to remove the callback.
   @note The callback is invoked on the main thread during event processing.
 */
-__STUFFY_API__ void stuffy_window_set_move_callback (
-  StuffyWindow *window, StuffyWindowMoveCallback callback
-);
-
+__STUFFY_API__ void
+stuffy_window_set_move_callback (StuffyWindow *window, StuffyWindowMoveCallback callback);
