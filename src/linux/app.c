@@ -15,7 +15,7 @@ LinuxPlatformState g_linux_state = {
   .initialized = false,
 };
 
-int32_t init_app (void)
+int32_t stuffy_app_init (void)
 {
   if (g_linux_state.initialized)
   {
@@ -36,7 +36,7 @@ int32_t init_app (void)
   return 0;
 }
 
-void update_app (void)
+void stuffy_app_update (void)
 {
   XEvent event;
 
@@ -70,7 +70,7 @@ void update_app (void)
   }
 }
 
-void deinit_app (void)
+void stuffy_app_deinit (void)
 {
   if (!g_linux_state.initialized)
   {
@@ -106,7 +106,7 @@ void process_client_message_event (XClientMessageEvent *p_event)
     {
       if (prop_data)
       {
-        (*(Window **)prop_data)->should_close = true;
+        (*(StuffyWindow **)prop_data)->should_close = true;
         XFree (prop_data);
       }
     }

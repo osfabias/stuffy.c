@@ -2,5 +2,5 @@
 
 #include "stuffy/input/mouse.h"
 
-extern MouseState g_mouse_state;
+extern StuffyMouseState g_mouse_state;
 

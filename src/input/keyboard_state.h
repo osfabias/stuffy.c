@@ -2,5 +2,5 @@
 
 #include "stuffy/input/keyboard.h"
 
-extern KeyboardState g_keyboard_state;
+extern StuffyKeyboardState g_keyboard_state;
 

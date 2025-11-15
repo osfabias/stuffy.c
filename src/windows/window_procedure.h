@@ -20,7 +20,7 @@ static LRESULT CALLBACK window_procedure (
     return 1;
   case WM_CLOSE :
   {
-    Window *stuffy_window = GetProp (window, WINDOW_PROPERTY_NAME);
+    StuffyWindow *stuffy_window = GetProp (window, WINDOW_PROPERTY_NAME);
 
     stuffy_window->should_close = true;
     break;
@@ -41,22 +41,22 @@ static LRESULT CALLBACK window_procedure (
     g_mouse_state.scroll = (float)GET_WHEEL_DELTA_WPARAM (wparam);
     break;
   case WM_LBUTTONDOWN :
-    g_mouse_state.buttons[ MOUSE_BUTTON_LEFT ] = 1;
+    g_mouse_state.buttons[ STUFFY_MOUSE_BUTTON_LEFT ] = 1;
     break;
   case WM_LBUTTONUP :
-    g_mouse_state.buttons[ MOUSE_BUTTON_LEFT ] = 0;
+    g_mouse_state.buttons[ STUFFY_MOUSE_BUTTON_LEFT ] = 0;
     break;
   case WM_RBUTTONDOWN :
-    g_mouse_state.buttons[ MOUSE_BUTTON_RIGHT ] = 1;
+    g_mouse_state.buttons[ STUFFY_MOUSE_BUTTON_RIGHT ] = 1;
     break;
   case WM_RBUTTONUP :
-    g_mouse_state.buttons[ MOUSE_BUTTON_RIGHT ] = 0;
+    g_mouse_state.buttons[ STUFFY_MOUSE_BUTTON_RIGHT ] = 0;
     break;
   case WM_MBUTTONDOWN :
-    g_mouse_state.buttons[ MOUSE_BUTTON_MIDDLE ] = 1;
+    g_mouse_state.buttons[ STUFFY_MOUSE_BUTTON_MIDDLE ] = 1;
     break;
   case WM_MBUTTONUP :
-    g_mouse_state.buttons[ MOUSE_BUTTON_MIDDLE ] = 0;
+    g_mouse_state.buttons[ STUFFY_MOUSE_BUTTON_MIDDLE ] = 0;
     break;
   case WM_DESTROY :
     PostQuitMessage (0);

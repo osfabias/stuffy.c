@@ -9,7 +9,7 @@
 
 @synthesize stuffyWindow;
 
-- (instancetype)initWithWindow:(Window *)window
+- (instancetype)initWithWindow:(StuffyWindow *)window
 {
   self = [super init];
   if (self) { self.stuffyWindow = window; }
@@ -25,22 +25,22 @@
 
 - (void)windowWillMiniaturize:(NSNotification *)notification
 {
-  self.stuffyWindow->state = WINDOW_STATE_ICONIFIED;
+  self.stuffyWindow->state = STUFFY_WINDOW_STATE_ICONIFIED;
 }
 
 - (void)windowWillDeminiaturize:(NSNotification *)notification
 {
-  self.stuffyWindow->state = WINDOW_STATE_NORMAL;
+  self.stuffyWindow->state = STUFFY_WINDOW_STATE_NORMAL;
 }
 
 - (void)windowWillEnterFullScreen:(NSNotification *)notification
 {
-  self.stuffyWindow->state = WINDOW_STATE_FULLSCREEN;
+  self.stuffyWindow->state = STUFFY_WINDOW_STATE_FULLSCREEN;
 }
 
 - (void)windowWillExitFullScreen:(NSNotification *)notification
 {
-  self.stuffyWindow->state = WINDOW_STATE_NORMAL;
+  self.stuffyWindow->state = STUFFY_WINDOW_STATE_NORMAL;
 }
 
 @end

@@ -8,13 +8,13 @@
 #import "src/macos/ContentView.h"
 #import "src/macos/WindowDelegate.h"
 
-struct Window
+struct StuffyWindow
 {
   NSWindow          *ns_window;
   ContentView       *content_view;
   WindowDelegate    *window_delegate;
   CAMetalLayer      *metal_layer;
-  WindowState        state;
+  StuffyWindowState state;
   BOOL               should_close;
 };
 

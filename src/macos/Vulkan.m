@@ -9,19 +9,19 @@
 
 #import "src/macos/Window.h"
 
-VkDeviceExtensions get_required_vk_device_extensions() {
+StuffyVkDeviceExtensions stuffy_vk_get_required_device_extensions() {
   static const char *extension_names[] = {
       "VK_KHR_surface",
       "VK_EXT_metal_surface",
   };
 
-  return (VkDeviceExtensions){
+  return (StuffyVkDeviceExtensions){
       .count = sizeof(extension_names) / sizeof(extension_names[0]),
       .names = extension_names,
   };
 }
 
-VkResult create_vk_surface(const VkSurfaceCreateInfo *info,
+VkResult stuffy_vk_create_surface(const StuffyVkSurfaceCreateInfo *info,
                            VkSurfaceKHR *surface) {
   const VkMetalSurfaceCreateInfoEXT surface_create_info = {
       .sType = VK_STRUCTURE_TYPE_METAL_SURFACE_CREATE_INFO_EXT,

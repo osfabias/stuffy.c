@@ -31,10 +31,10 @@
   @details Initializes the application instance. This must be called before
            using any other library functions that require an application context.
   @return 0 on success, non-zero on failure.
-  @note The application must be deinitialized using @ref deinit_app when no longer
+  @note The application must be deinitialized using @ref stuffy_app_deinit when no longer
         needed.
 */
-__STUFFY_API__ int32_t init_app (void);
+__STUFFY_API__ int32_t stuffy_app_init (void);
 
 /*
   @brief Updates the application state.
@@ -44,7 +44,7 @@ __STUFFY_API__ int32_t init_app (void);
   @note This function must be called regularly for the application to
         function correctly. Input states are updated during this call.
 */
-__STUFFY_API__ void update_app (void);
+__STUFFY_API__ void stuffy_app_update (void);
 
 /*
   @brief Deinitializes the application instance.
@@ -52,4 +52,4 @@ __STUFFY_API__ void update_app (void);
   @note After calling this function, the application should not be used for
         any further operations.
 */
-__STUFFY_API__ void deinit_app (void);
+__STUFFY_API__ void stuffy_app_deinit (void);

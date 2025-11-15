@@ -14,19 +14,19 @@
 #include "src/windows/window_procedure.h"
 
 inline static bool  is_window_fullscreen (HWND window);
-inline static void  set_window_fullscreen (Window *window, bool fullscreen);
-inline static HWND  open_windows_window (const WindowConf *conf);
-inline static DWORD translate_style_mask (WindowStyleMask style_mask);
+inline static void  set_window_fullscreen (StuffyWindow *window, bool fullscreen);
+inline static HWND  open_windows_window (const StuffyWindowConfig *config);
+inline static DWORD translate_style_mask (StuffyWindowStyleMask style_mask);
 
-Window *open_window (const WindowConf *conf)
+StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
 {
-  Window *window = malloc (sizeof (Window));
+  StuffyWindow *window = malloc (sizeof (StuffyWindow));
   if (window == NULL)
   {
     return NULL;
   }
 
-  window->windows_window = open_windows_window (conf);
+  window->windows_window = open_windows_window (config);
   if (window->windows_window == NULL)
   {
     goto FAILED_WINDOWS_WINDOW;
@@ -37,7 +37,7 @@ Window *open_window (const WindowConf *conf)
     goto FAILED_SET_PROP;
   }
 
-  if (!(conf->style_mask & WINDOW_STYLE_CLOSABLE_BIT))
+  if (!(config->style_mask & STUFFY_WINDOW_STYLE_CLOSABLE_BIT))
   {
     EnableMenuItem (GetSystemMenu (window->windows_window, FALSE), SC_CLOSE,
       MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
@@ -45,7 +45,7 @@ Window *open_window (const WindowConf *conf)
 
   ShowWindow (window->windows_window, SW_SHOW);
 
-  window->window_init_style = translate_style_mask (conf->style_mask);
+  window->window_init_style = translate_style_mask (config->style_mask);
   window->should_close      = false;
 
   return window;
@@ -57,40 +57,40 @@ FAILED_WINDOWS_WINDOW:
   return NULL;
 }
 
-void close_window (Window *window)
+void stuffy_window_close (StuffyWindow *window)
 {
   DestroyWindow (window->windows_window);
 
   free (window);
 }
 
-bool should_window_close (Window *window) { return window->should_close; }
+bool stuffy_window_should_close (StuffyWindow *window) { return window->should_close; }
 
-void set_window_title (Window *window, const char *title)
+void stuffy_window_set_title (StuffyWindow *window, const char *title)
 {
   SetWindowText (window->windows_window, title);
 }
 
-const char *get_window_title (Window *window)
+const char *stuffy_window_get_title (StuffyWindow *window)
 {
   static char buf[ 128 ];
   GetWindowText (window->windows_window, buf, sizeof (buf) / sizeof (buf[ 0 ]));
   return buf;
 }
 
-void set_window_rect (Window *window, WindowRect rect)
+void stuffy_window_set_rect (StuffyWindow *window, StuffyWindowRect rect)
 {
-  if (get_window_state (window) != WINDOW_STATE_NORMAL) { return; }
+  if (stuffy_window_get_state (window) != STUFFY_WINDOW_STATE_NORMAL) { return; }
 
   MoveWindow (window->windows_window, rect.x, rect.y, rect.width, rect.height, TRUE);
 }
 
-WindowRect get_window_rect (Window *window)
+StuffyWindowRect stuffy_window_get_rect (StuffyWindow *window)
 {
   RECT rect;
   GetWindowRect (window->windows_window, &rect);
 
-  WindowRect window_rect = {
+  StuffyWindowRect window_rect = {
     .x      = (int32_t)rect.left,
     .y      = (int32_t)rect.top,
     .width  = (uint32_t)(rect.right - rect.left),
@@ -100,17 +100,17 @@ WindowRect get_window_rect (Window *window)
   return window_rect;
 }
 
-void set_window_state (Window *window, WindowState state)
+void stuffy_window_set_state (StuffyWindow *window, StuffyWindowState state)
 {
-  set_window_fullscreen (window, state == WINDOW_STATE_FULLSCREEN);
-  if (state == WINDOW_STATE_FULLSCREEN) { return; }
+  set_window_fullscreen (window, state == STUFFY_WINDOW_STATE_FULLSCREEN);
+  if (state == STUFFY_WINDOW_STATE_FULLSCREEN) { return; }
 
   switch (state)
   {
-  case WINDOW_STATE_ICONIFIED :
+  case STUFFY_WINDOW_STATE_ICONIFIED :
     ShowWindow (window->windows_window, SW_HIDE);
     break;
-  case WINDOW_STATE_NORMAL :
+  case STUFFY_WINDOW_STATE_NORMAL :
     ShowWindow (window->windows_window, SW_SHOW);
     break;
   default :
@@ -118,40 +118,40 @@ void set_window_state (Window *window, WindowState state)
   }
 }
 
-WindowState get_window_state (Window *window)
+StuffyWindowState stuffy_window_get_state (StuffyWindow *window)
 {
   if (IsIconic (window->windows_window))
   {
-    return WINDOW_STATE_ICONIFIED;
+    return STUFFY_WINDOW_STATE_ICONIFIED;
   }
   if (is_window_fullscreen (window->windows_window))
   {
-    return WINDOW_STATE_FULLSCREEN;
+    return STUFFY_WINDOW_STATE_FULLSCREEN;
   }
-  return WINDOW_STATE_NORMAL;
+  return STUFFY_WINDOW_STATE_NORMAL;
 }
 
-HWND open_windows_window (const WindowConf *conf)
+HWND open_windows_window (const StuffyWindowConfig *config)
 {
   return CreateWindowEx (0,
     WINDOW_CLASS_NAME,
-    conf->title,
-    translate_style_mask (conf->style_mask),
-    conf->rect.x,
-    conf->rect.y,
-    conf->rect.width,
-    conf->rect.height,
+    config->title,
+    translate_style_mask (config->style_mask),
+    config->rect.x,
+    config->rect.y,
+    config->rect.width,
+    config->rect.height,
     NULL,
     NULL,
     g_windows_state.module,
     NULL);
 }
 
-DWORD translate_style_mask (WindowStyleMask style_mask)
+DWORD translate_style_mask (StuffyWindowStyleMask style_mask)
 {
   DWORD windows_style_mask = WS_BORDER;
 
-  if (style_mask & WINDOW_STYLE_TITLED_BIT)
+  if (style_mask & STUFFY_WINDOW_STYLE_TITLED_BIT)
   {
     windows_style_mask |= WS_CAPTION | WS_SYSMENU;
   }
@@ -160,12 +160,12 @@ DWORD translate_style_mask (WindowStyleMask style_mask)
     windows_style_mask |= WS_POPUP;
   }
 
-  if (style_mask & WINDOW_STYLE_ICONIFIABLE_BIT)
+  if (style_mask & STUFFY_WINDOW_STYLE_ICONIFIABLE_BIT)
   {
     windows_style_mask |= WS_MINIMIZEBOX;
   }
 
-  if (style_mask & WINDOW_STYLE_RESIZABLE_BIT)
+  if (style_mask & STUFFY_WINDOW_STYLE_RESIZABLE_BIT)
   {
     windows_style_mask |= WS_MAXIMIZEBOX | WS_SIZEBOX;
   }
@@ -173,7 +173,7 @@ DWORD translate_style_mask (WindowStyleMask style_mask)
   return windows_style_mask;
 }
 
-void set_window_fullscreen (Window *window, bool fullscreen)
+void set_window_fullscreen (StuffyWindow *window, bool fullscreen)
 {
   if (fullscreen)
   {

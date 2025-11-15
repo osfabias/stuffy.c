@@ -8,9 +8,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface WindowDelegate : NSObject <NSWindowDelegate>
 
-@property (nonatomic) Window *stuffyWindow;
+@property (nonatomic) StuffyWindow *stuffyWindow;
 
-- (instancetype)initWithWindow:(Window *)window;
+- (instancetype)initWithWindow:(StuffyWindow *)window;
 
 @end
 

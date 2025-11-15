@@ -2,7 +2,7 @@
 
 #include "src/input/keyboard_state.h"
 
-KeyboardState g_keyboard_state = {0};
+StuffyKeyboardState g_keyboard_state = {0};
 
-const KeyboardState *get_keyboard_state (void) { return &g_keyboard_state; }
+const StuffyKeyboardState *stuffy_keyboard_get_state (void) { return &g_keyboard_state; }
 

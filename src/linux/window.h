@@ -6,7 +6,7 @@
 
 #define WINDOW_BACKLINK_PROPERTY_NAME "STUFFY_WINDOW_BACKLINK"
 
-struct Window
+struct StuffyWindow
 {
   XID  x11_window;
   bool should_close;

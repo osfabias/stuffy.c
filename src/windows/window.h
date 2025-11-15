@@ -4,7 +4,7 @@
 
 #include <windows.h>
 
-struct Window
+struct StuffyWindow
 {
   HWND windows_window;
   LONG window_init_style;

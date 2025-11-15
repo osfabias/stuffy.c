@@ -16,9 +16,9 @@
 
 inline static void send_x11_window_fullscreen_switch_event (XID x11_window, int32_t state);
 
-Window *open_window (const WindowConf *conf)
+StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
 {
-  Window *window = malloc (sizeof (Window));
+  StuffyWindow *window = malloc (sizeof (StuffyWindow));
   if (window == NULL)
   {
     return NULL;
@@ -47,10 +47,10 @@ Window *open_window (const WindowConf *conf)
 
   window->x11_window = XCreateWindow (g_linux_state.display,
     g_linux_state.root_window,
-    conf->rect.x,
-    conf->rect.y,
-    conf->rect.width,
-    conf->rect.height,
+    config->rect.x,
+    config->rect.y,
+    config->rect.width,
+    config->rect.height,
     1,
     DefaultDepth (g_linux_state.display, g_linux_state.screen_index),
     InputOutput,
@@ -64,7 +64,7 @@ Window *open_window (const WindowConf *conf)
     return NULL;
   }
 
-  XStoreName (g_linux_state.display, window->x11_window, conf->title);
+  XStoreName (g_linux_state.display, window->x11_window, config->title);
 
   XChangeProperty (g_linux_state.display,
     window->x11_window,
@@ -73,19 +73,19 @@ Window *open_window (const WindowConf *conf)
     8,
     PropModeReplace,
     (unsigned char *)&window,
-    sizeof (Window *));
+    sizeof (StuffyWindow *));
 
   XMapWindow (g_linux_state.display, window->x11_window);
 
   XMoveWindow (g_linux_state.display,
     window->x11_window,
-    conf->rect.x - (int32_t)conf->rect.width / 2,
-    conf->rect.y - (int32_t)conf->rect.height / 2);
+    config->rect.x - (int32_t)config->rect.width / 2,
+    config->rect.y - (int32_t)config->rect.height / 2);
 
   return window;
 }
 
-void close_window (Window *window)
+void stuffy_window_close (StuffyWindow *window)
 {
   XUnmapWindow (g_linux_state.display, window->x11_window);
 
@@ -94,14 +94,14 @@ void close_window (Window *window)
   free (window);
 }
 
-bool should_window_close (Window *window) { return window->should_close; }
+bool stuffy_window_should_close (StuffyWindow *window) { return window->should_close; }
 
-void set_window_title (Window *window, const char *title)
+void stuffy_window_set_title (StuffyWindow *window, const char *title)
 {
   XStoreName (g_linux_state.display, window->x11_window, title);
 }
 
-const char *get_window_title (Window *window)
+const char *stuffy_window_get_title (StuffyWindow *window)
 {
   static char *window_title = NULL;
   if (window_title != NULL)
@@ -115,15 +115,15 @@ const char *get_window_title (Window *window)
   return window_title;
 }
 
-void set_window_rect (Window *window, WindowRect rect)
+void stuffy_window_set_rect (StuffyWindow *window, StuffyWindowRect rect)
 {
-  if (get_window_state (window) != WINDOW_STATE_NORMAL) { return; }
+  if (stuffy_window_get_state (window) != STUFFY_WINDOW_STATE_NORMAL) { return; }
 
   XMoveWindow (g_linux_state.display, window->x11_window, rect.x, rect.y);
   XResizeWindow (g_linux_state.display, window->x11_window, rect.width, rect.height);
 }
 
-WindowRect get_window_rect (Window *window)
+StuffyWindowRect stuffy_window_get_rect (StuffyWindow *window)
 {
   XID          root_win;
   uint32_t     width, height;
@@ -140,7 +140,7 @@ WindowRect get_window_rect (Window *window)
     &border,
     &depth);
 
-  WindowRect rect = {
+  StuffyWindowRect rect = {
     .x      = x,
     .y      = y,
     .width  = width,
@@ -150,17 +150,17 @@ WindowRect get_window_rect (Window *window)
   return rect;
 }
 
-void set_window_state (Window *window, WindowState state)
+void stuffy_window_set_state (StuffyWindow *window, StuffyWindowState state)
 {
   switch (state)
   {
-  case WINDOW_STATE_FULLSCREEN :
+  case STUFFY_WINDOW_STATE_FULLSCREEN :
     send_x11_window_fullscreen_switch_event (window->x11_window, 1);
     break;
-  case WINDOW_STATE_ICONIFIED :
+  case STUFFY_WINDOW_STATE_ICONIFIED :
     XIconifyWindow (g_linux_state.display, window->x11_window, g_linux_state.screen_index);
     break;
-  case WINDOW_STATE_NORMAL :
+  case STUFFY_WINDOW_STATE_NORMAL :
     send_x11_window_fullscreen_switch_event (window->x11_window, 0);
     break;
   default :
@@ -168,7 +168,7 @@ void set_window_state (Window *window, WindowState state)
   }
 }
 
-WindowState get_window_state (Window *window)
+StuffyWindowState stuffy_window_get_state (StuffyWindow *window)
 {
   Atom atom_state      = XInternAtom (g_linux_state.display, "_NET_WM_STATE", True);
   Atom atom_fullscreen = XInternAtom (g_linux_state.display, "_NET_WM_STATE_FULLSCREEN", True);
@@ -197,17 +197,17 @@ WindowState get_window_state (Window *window)
     if (property[ i ] == atom_fullscreen)
     {
       XFree (property);
-      return WINDOW_STATE_FULLSCREEN;
+      return STUFFY_WINDOW_STATE_FULLSCREEN;
     }
     else if (property[ i ] == atom_iconified)
     {
       XFree (property);
-      return WINDOW_STATE_ICONIFIED;
+      return STUFFY_WINDOW_STATE_ICONIFIED;
     }
   }
 
   XFree (property);
-  return WINDOW_STATE_NORMAL;
+  return STUFFY_WINDOW_STATE_NORMAL;
 }
 
 void send_x11_window_fullscreen_switch_event (XID x11_window, int32_t state)

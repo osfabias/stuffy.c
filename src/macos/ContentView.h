@@ -12,11 +12,11 @@ NS_ASSUME_NONNULL_BEGIN
   NSWindow *ns_window;
 }
 
-@property (nonatomic) Window *stuffyWindow;
+@property (nonatomic) StuffyWindow *stuffyWindow;
 
-- (instancetype)initWithWindow:(Window *)window;
+- (instancetype)initWithWindow:(StuffyWindow *)window;
 
-+ (Key)translateKeyCode:(unsigned short)key_code;
++ (StuffyKey)translateKeyCode:(unsigned short)key_code;
 
 @end
 

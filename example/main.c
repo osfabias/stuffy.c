@@ -36,26 +36,26 @@
 int main (void)
 {
   // Initialize application
-  if (init_app ( ) != 0)
+  if (stuffy_app_init ( ) != 0)
   {
     fprintf (stderr, "Failed to initialize application\n");
     return EXIT_FAILURE;
   }
 
   // Configure window
-  WindowConf conf = {
+  StuffyWindowConfig config = {
     .title      = "Stuffy.c Example",
     .rect       = {.x = 100, .y = 100, .width = 800, .height = 600},
-    .style_mask = WINDOW_STYLE_TITLED_BIT | WINDOW_STYLE_CLOSABLE_BIT |
-                  WINDOW_STYLE_ICONIFIABLE_BIT | WINDOW_STYLE_RESIZABLE_BIT,
+    .style_mask = STUFFY_WINDOW_STYLE_TITLED_BIT | STUFFY_WINDOW_STYLE_CLOSABLE_BIT |
+                  STUFFY_WINDOW_STYLE_ICONIFIABLE_BIT | STUFFY_WINDOW_STYLE_RESIZABLE_BIT,
   };
 
   // Open window
-  Window *window = open_window (&conf);
+  StuffyWindow *window = stuffy_window_open (&config);
   if (window == NULL)
   {
     fprintf (stderr, "Failed to open window\n");
-    deinit_app ( );
+    stuffy_app_deinit ( );
     return EXIT_FAILURE;
   }
 
@@ -63,17 +63,17 @@ int main (void)
   printf ("Press ESC to close the window\n");
 
   // Main loop
-  while (!should_window_close (window))
+  while (!stuffy_window_should_close (window))
   {
     // Update application (processes events and updates input state)
-    update_app ( );
+    stuffy_app_update ( );
 
     // Get input states
-    const KeyboardState *keyboard = get_keyboard_state ( );
-    const MouseState    *mouse    = get_mouse_state ( );
+    const StuffyKeyboardState *keyboard = stuffy_keyboard_get_state ( );
+    const StuffyMouseState    *mouse    = stuffy_mouse_get_state ( );
 
     // Check for ESC key to close window
-    if (keyboard->keys[ KEY_ESCAPE ]) { break; }
+    if (keyboard->keys[ STUFFY_KEY_ESCAPE ]) { break; }
 
     // Example: Print mouse position when mouse moves
     static int32_t last_x = -1, last_y = -1;
@@ -85,12 +85,12 @@ int main (void)
     }
 
     // Example: Print when mouse buttons are pressed
-    if (mouse->buttons[ MOUSE_BUTTON_LEFT ]) { puts ("Left mouse button pressed"); }
+    if (mouse->buttons[ STUFFY_MOUSE_BUTTON_LEFT ]) { puts ("Left mouse button pressed"); }
   }
 
   // Cleanup
-  close_window (window);
-  deinit_app ( );
+  stuffy_window_close (window);
+  stuffy_app_deinit ( );
 
   printf ("Application closed successfully\n");
 

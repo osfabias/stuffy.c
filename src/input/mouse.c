@@ -2,7 +2,7 @@
 
 #include "src/input/mouse_state.h"
 
-MouseState g_mouse_state = {0};
+StuffyMouseState g_mouse_state = {0};
 
-const MouseState *get_mouse_state (void) { return &g_mouse_state; }
+const StuffyMouseState *stuffy_mouse_get_state (void) { return &g_mouse_state; }
 

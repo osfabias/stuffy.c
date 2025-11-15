@@ -15,7 +15,7 @@ inline static void register_window_class (void);
 
 WindowsPlatformState g_windows_state = {0};
 
-int32_t init_app (void)
+int32_t stuffy_app_init (void)
 {
   g_windows_state.module = get_current_module_handle ( );
 
@@ -24,7 +24,7 @@ int32_t init_app (void)
   return 0;
 }
 
-void update_app (void)
+void stuffy_app_update (void)
 {
   for (MSG message; PeekMessage (&message, NULL, 0, 0, PM_REMOVE);)
   {
@@ -33,7 +33,7 @@ void update_app (void)
   }
 }
 
-void deinit_app (void)
+void stuffy_app_deinit (void)
 {
   UnregisterClass (WINDOW_CLASS_NAME, g_windows_state.module);
 }

@@ -37,23 +37,23 @@
 typedef enum
 {
   /* Left mouse button. */
-  MOUSE_BUTTON_LEFT,
+  STUFFY_MOUSE_BUTTON_LEFT,
 
   /* Right mouse button. */
-  MOUSE_BUTTON_RIGHT,
+  STUFFY_MOUSE_BUTTON_RIGHT,
 
   /* Middle mouse button (scroll). */
-  MOUSE_BUTTON_MIDDLE,
+  STUFFY_MOUSE_BUTTON_MIDDLE,
 
   /* Side mouse button. */
-  MOUSE_BUTTON_FORWARD,
+  STUFFY_MOUSE_BUTTON_FORWARD,
 
   /* Side mouse button. */
-  MOUSE_BUTTON_BACKWARD,
+  STUFFY_MOUSE_BUTTON_BACKWARD,
 
   /* Number of mouse buttons. */
-  MOUSE_BUTTON_COUNT
-} MouseButton;
+  STUFFY_MOUSE_BUTTON_COUNT
+} StuffyMouseButton;
 
 /*
   @brief Mouse state structure.
@@ -73,17 +73,17 @@ typedef struct
   float scroll;
 
   /* Buttons state. */
-  bool buttons[ MOUSE_BUTTON_COUNT ];
-} MouseState;
+  bool buttons[ STUFFY_MOUSE_BUTTON_COUNT ];
+} StuffyMouseState;
 
 /*
   @brief Returns the current mouse state.
   @details Retrieves a pointer to the global mouse state structure.
-           The state is updated automatically during each @ref update_app call.
+           The state is updated automatically during each @ref stuffy_app_update call.
   @return Pointer to the mouse state structure. The returned pointer is
           owned by the library and should not be freed by the caller. The
-          state is updated after each @ref update_app call.
+          state is updated after each @ref stuffy_app_update call.
   @note The mouse state is global and shared across all application instances.
 */
-__STUFFY_API__ const MouseState *get_mouse_state (void);
+__STUFFY_API__ const StuffyMouseState *stuffy_mouse_get_state (void);
 

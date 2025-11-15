@@ -36,5 +36,5 @@
 typedef struct
 {
   int32_t x, y;
-} Point;
+} StuffyPoint;
 

@@ -8,16 +8,16 @@
 #import "src/macos/Window.h"
 #import "src/macos/WindowDelegate.h"
 
-inline static Window        *alloc_window_struct (void);
-inline static WindowDelegate *alloc_window_delegate (Window *);
-inline static ContentView    *alloc_content_view (Window *);
-inline static NSWindow       *alloc_ns_window (const WindowConf *);
+inline static StuffyWindow        *alloc_window_struct (void);
+inline static WindowDelegate *alloc_window_delegate (StuffyWindow *);
+inline static ContentView    *alloc_content_view (StuffyWindow *);
+inline static NSWindow       *alloc_ns_window (const StuffyWindowConfig *);
 inline static CAMetalLayer   *alloc_metal_layer (ContentView *);
 inline static float           transform_y (float);
 
-Window *open_window (const WindowConf *conf)
+StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
 {
-  Window *window = alloc_window_struct ( );
+  StuffyWindow *window = alloc_window_struct ( );
   if (!window) { return NULL; }
 
   window->window_delegate = alloc_window_delegate (window);
@@ -26,7 +26,7 @@ Window *open_window (const WindowConf *conf)
   window->content_view = alloc_content_view (window);
   if (!window->content_view) { goto FAILED_INIT_CONTENT_VIEW; }
 
-  window->ns_window = alloc_ns_window (conf);
+  window->ns_window = alloc_ns_window (config);
   if (!window->ns_window) { goto FAILED_INIT_NS_WINDOW; }
   [window->ns_window setDelegate:window->window_delegate];
   [window->ns_window setContentView:window->content_view];
@@ -49,7 +49,7 @@ FAILED_WINDOW_DELEGATE:
   return NULL;
 }
 
-void close_window (Window *window)
+void stuffy_window_close (StuffyWindow *window)
 {
   [window->ns_window orderOut:nil];
 
@@ -66,27 +66,27 @@ void close_window (Window *window)
   free (window);
 }
 
-bool should_window_close (Window *window)
+bool stuffy_window_should_close (StuffyWindow *window)
 {
   return window->should_close == YES;
 }
 
-void set_window_title (Window *window, const char *title)
+void stuffy_window_set_title (StuffyWindow *window, const char *title)
 {
   [window->ns_window setTitle:[NSString stringWithCString:title
                                                  encoding:NSUTF8StringEncoding]];
 }
 
-const char *get_window_title (Window *window)
+const char *stuffy_window_get_title (StuffyWindow *window)
 {
   const char *const title =
     [window->ns_window.title cStringUsingEncoding:NSUTF8StringEncoding];
   return title ? title : "";
 }
 
-void set_window_rect (Window *window, WindowRect rect)
+void stuffy_window_set_rect (StuffyWindow *window, StuffyWindowRect rect)
 {
-  if (get_window_state (window) != WINDOW_STATE_NORMAL) { return; }
+  if (stuffy_window_get_state (window) != STUFFY_WINDOW_STATE_NORMAL) { return; }
 
   @autoreleasepool
   {
@@ -100,13 +100,13 @@ void set_window_rect (Window *window, WindowRect rect)
   }  // autoreleasepool
 }
 
-WindowRect get_window_rect (Window *window)
+StuffyWindowRect stuffy_window_get_rect (StuffyWindow *window)
 {
   @autoreleasepool
   {
     const NSRect rect = [window->ns_window contentRectForFrameRect:[window->ns_window frame]];
 
-    WindowRect window_rect = {
+    StuffyWindowRect window_rect = {
       .x = (int32_t)rect.origin.x,
       .y = (int32_t)transform_y (rect.origin.y + rect.size.height - 1),
       .width = (uint32_t)rect.size.width,
@@ -117,9 +117,9 @@ WindowRect get_window_rect (Window *window)
   }  // autoreleasepool
 }
 
-void set_window_state (Window *window, WindowState state)
+void stuffy_window_set_state (StuffyWindow *window, StuffyWindowState state)
 {
-  if ((state == WINDOW_STATE_FULLSCREEN) !=
+  if ((state == STUFFY_WINDOW_STATE_FULLSCREEN) !=
       (bool)(window->ns_window.styleMask & NSWindowStyleMaskFullScreen))
   {
     [window->ns_window toggleFullScreen:nil];
@@ -129,38 +129,38 @@ void set_window_state (Window *window, WindowState state)
 
   switch (state)
   {
-  case WINDOW_STATE_ICONIFIED :
+  case STUFFY_WINDOW_STATE_ICONIFIED :
     [window->ns_window miniaturize:nil];
     break;
-  case WINDOW_STATE_NORMAL :
+  case STUFFY_WINDOW_STATE_NORMAL :
     [window->ns_window deminiaturize:nil];
     break;
-  case WINDOW_STATE_FULLSCREEN :
+  case STUFFY_WINDOW_STATE_FULLSCREEN :
     break;
   default :
     return;
   }
 }
 
-WindowState get_window_state (Window *window)
+StuffyWindowState stuffy_window_get_state (StuffyWindow *window)
 {
   return window->state;
 }
 
-Window *alloc_window_struct (void)
+StuffyWindow *alloc_window_struct (void)
 {
-  Window *const window = malloc (sizeof (Window));
+  StuffyWindow *const window = malloc (sizeof (StuffyWindow));
   if (!window)
   {
     return NULL;
   }
 
-  *window = (Window) {.state = WINDOW_STATE_NORMAL};
+  *window = (StuffyWindow) {.state = STUFFY_WINDOW_STATE_NORMAL};
 
   return window;
 }
 
-WindowDelegate *alloc_window_delegate (Window *window)
+WindowDelegate *alloc_window_delegate (StuffyWindow *window)
 {
   WindowDelegate *delegate = [WindowDelegate alloc];
   delegate = [delegate initWithWindow:window];
@@ -172,19 +172,19 @@ WindowDelegate *alloc_window_delegate (Window *window)
   return delegate;
 }
 
-NSWindow *alloc_ns_window (const WindowConf *conf)
+NSWindow *alloc_ns_window (const StuffyWindowConfig *config)
 {
   @autoreleasepool
   {
-    const NSRect ns_window_rect = NSMakeRect (conf->rect.x,
-      transform_y (conf->rect.y + conf->rect.height - 1), conf->rect.width,
-      conf->rect.height);
+    const NSRect ns_window_rect = NSMakeRect (config->rect.x,
+      transform_y (config->rect.y + config->rect.height - 1), config->rect.width,
+      config->rect.height);
 
     NSWindow *ns_window = [NSWindow alloc];
     ns_window = [ns_window initWithContentRect:ns_window_rect
                          // window style mask and ns window
                          // style mask are compatible
-                         styleMask:(NSWindowStyleMask)conf->style_mask
+                         styleMask:(NSWindowStyleMask)config->style_mask
                            backing:NSBackingStoreBuffered
                              defer:NO];
     if (!ns_window)
@@ -192,7 +192,7 @@ NSWindow *alloc_ns_window (const WindowConf *conf)
       return NULL;
     }
 
-    [ns_window setTitle:[NSString stringWithCString:conf->title
+    [ns_window setTitle:[NSString stringWithCString:config->title
                                            encoding:NSUTF8StringEncoding]];
 
     [ns_window makeKeyAndOrderFront:nil];
@@ -205,7 +205,7 @@ NSWindow *alloc_ns_window (const WindowConf *conf)
   }  // autoreleasepool
 }
 
-ContentView *alloc_content_view (Window *window)
+ContentView *alloc_content_view (StuffyWindow *window)
 {
   ContentView *view = [ContentView alloc];
   view = [view initWithWindow:window];

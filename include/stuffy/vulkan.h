@@ -40,7 +40,7 @@
 typedef struct
 {
   /* Window handle. */
-  const Window *window;
+  const StuffyWindow *window;
 
   /* Vulkan instance. */
   VkInstance instance;
@@ -49,20 +49,20 @@ typedef struct
   const VkAllocationCallbacks *allocator;
 
   /* A pointer to an out vulkan surface variable. */
-} VkSurfaceCreateInfo;
+} StuffyVkSurfaceCreateInfo;
 
 /* Structure, that holds a list of extensions names and it's count */
 typedef struct
 {
   uint32_t     count;
   const char **names;
-} VkDeviceExtensions;
+} StuffyVkDeviceExtensions;
 
 /*
   @brief Returns structure, that holds requirde device extensions
   @returns Structure that holds info about extensions
 */
-VkDeviceExtensions get_required_vk_device_extensions (void);
+__STUFFY_API__ StuffyVkDeviceExtensions stuffy_vk_get_required_device_extensions (void);
 
 /*
   @brief Creates a Vulkan surface from a window.
@@ -77,4 +77,4 @@ VkDeviceExtensions get_required_vk_device_extensions (void);
         when no longer needed.
 */
 __STUFFY_API__ VkResult
-create_vk_surface (const VkSurfaceCreateInfo *info, VkSurfaceKHR *surface);
+stuffy_vk_create_surface (const StuffyVkSurfaceCreateInfo *info, VkSurfaceKHR *surface);
