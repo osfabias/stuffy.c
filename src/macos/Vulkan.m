@@ -9,18 +9,6 @@
 
 #import "src/macos/Window.h"
 
-StuffyVkDeviceExtensions stuffy_vk_get_required_device_extensions() {
-  static const char *extension_names[] = {
-      "VK_KHR_surface",
-      "VK_EXT_metal_surface",
-  };
-
-  return (StuffyVkDeviceExtensions){
-      .count = sizeof(extension_names) / sizeof(extension_names[0]),
-      .names = extension_names,
-  };
-}
-
 VkResult stuffy_vk_create_surface(const StuffyVkSurfaceCreateInfo *info,
                            VkSurfaceKHR *surface) {
   const VkMetalSurfaceCreateInfoEXT surface_create_info = {

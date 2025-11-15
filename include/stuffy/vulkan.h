@@ -51,19 +51,6 @@ typedef struct
   /* A pointer to an out vulkan surface variable. */
 } StuffyVkSurfaceCreateInfo;
 
-/* Structure, that holds a list of extensions names and it's count */
-typedef struct
-{
-  uint32_t     count;
-  const char **names;
-} StuffyVkDeviceExtensions;
-
-/*
-  @brief Returns structure, that holds requirde device extensions
-  @returns Structure that holds info about extensions
-*/
-__STUFFY_API__ StuffyVkDeviceExtensions stuffy_vk_get_required_device_extensions (void);
-
 /*
   @brief Creates a Vulkan surface from a window.
   @details Creates a Vulkan surface that can be used for rendering to the
