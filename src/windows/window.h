@@ -9,5 +9,6 @@ struct StuffyWindow
   HWND windows_window;
   LONG window_init_style;
   bool should_close;
+  void (*resize_callback) (struct StuffyWindow *, uint32_t, uint32_t);
 };
 

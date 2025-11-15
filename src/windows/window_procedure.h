@@ -58,6 +58,17 @@ static LRESULT CALLBACK window_procedure (
   case WM_MBUTTONUP :
     g_mouse_state.buttons[ STUFFY_MOUSE_BUTTON_MIDDLE ] = 0;
     break;
+  case WM_SIZE :
+  {
+    StuffyWindow *stuffy_window = GetProp (window, WINDOW_PROPERTY_NAME);
+    if (stuffy_window && stuffy_window->resize_callback)
+    {
+      const uint32_t width  = (uint32_t)LOWORD (lparam);
+      const uint32_t height = (uint32_t)HIWORD (lparam);
+      stuffy_window->resize_callback (stuffy_window, width, height);
+    }
+    break;
+  }
   case WM_DESTROY :
     PostQuitMessage (0);
     break;

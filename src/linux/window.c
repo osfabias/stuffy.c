@@ -25,6 +25,7 @@ StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
   }
 
   window->should_close = false;
+  window->resize_callback = NULL;
 
   XSetWindowAttributes attrs = {
     .background_pixmap = ParentRelative,
@@ -34,7 +35,8 @@ StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
     .bit_gravity       = 0,
     .win_gravity       = NorthWestGravity,
     .event_mask =
-      KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonRelease | PointerMotionMask,
+      KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonRelease | PointerMotionMask |
+      StructureNotifyMask,
     .save_under            = 0,
     .backing_pixel         = 0,
     .backing_store         = 0,
@@ -232,5 +234,12 @@ void send_x11_window_fullscreen_switch_event (XID x11_window, int32_t state)
 
   XSendEvent (
     g_linux_state.display, g_linux_state.root_window, propagate, event_mask, &event);
+}
+
+void stuffy_window_set_resize_callback (
+  StuffyWindow *window, StuffyWindowResizeCallback callback)
+{
+  if (window == NULL) { return; }
+  window->resize_callback = callback;
 }
 

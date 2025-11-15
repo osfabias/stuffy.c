@@ -33,6 +33,20 @@
 #include <stuffy/input/mouse.h>
 #include <stuffy/window.h>
 
+/*
+  @brief Window resize callback function.
+  @details This callback is invoked whenever the window is resized.
+  @param window Pointer to the window that was resized.
+  @param width New width of the window in pixels.
+  @param height New height of the window in pixels.
+*/
+static void on_window_resize (
+  StuffyWindow *window, uint32_t width, uint32_t height)
+{
+  (void)window; // Unused parameter
+  printf ("Window resized to %ux%u\n", width, height);
+}
+
 int main (void)
 {
   // Initialize application
@@ -61,6 +75,10 @@ int main (void)
 
   printf ("Window opened successfully!\n");
   printf ("Press ESC to close the window\n");
+  printf ("Try resizing the window to see the resize callback in action\n");
+
+  // Set window resize callback
+  stuffy_window_set_resize_callback (window, on_window_resize);
 
   // Main loop
   while (!stuffy_window_should_close (window))

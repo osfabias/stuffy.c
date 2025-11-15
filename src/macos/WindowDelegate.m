@@ -43,5 +43,18 @@
   self.stuffyWindow->state = STUFFY_WINDOW_STATE_NORMAL;
 }
 
+- (void)windowDidResize:(NSNotification *)notification
+{
+  if (self.stuffyWindow && self.stuffyWindow->resize_callback)
+  {
+    const NSRect content_rect = [self.stuffyWindow->ns_window contentRectForFrameRect:[self.stuffyWindow->ns_window frame]];
+    self.stuffyWindow->resize_callback (
+      self.stuffyWindow,
+      (uint32_t)content_rect.size.width,
+      (uint32_t)content_rect.size.height
+    );
+  }
+}
+
 @end
 

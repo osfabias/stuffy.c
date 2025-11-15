@@ -90,6 +90,18 @@ typedef struct
 typedef struct StuffyWindow StuffyWindow;
 
 /*
+  @brief Window resize callback function type.
+  @details This callback is invoked when the window is resized. The callback
+           receives the new window dimensions.
+  @param window Pointer to the StuffyWindow instance that was resized.
+  @param width New width of the window in pixels.
+  @param height New height of the window in pixels.
+*/
+typedef void (*StuffyWindowResizeCallback) (
+  StuffyWindow *window, uint32_t width, uint32_t height
+);
+
+/*
   @brief Opens a window.
   @details Creates and displays a new window based on the provided configuration.
            The window is created with the specified title, size, position, and
@@ -170,4 +182,18 @@ __STUFFY_API__ void stuffy_window_set_state (StuffyWindow *window, StuffyWindowS
   @return Current window state.
 */
 __STUFFY_API__ StuffyWindowState stuffy_window_get_state (StuffyWindow *window);
+
+/*
+  @brief Sets the window resize callback.
+  @details Registers a callback function that will be invoked whenever the window
+           is resized. The callback receives the new window dimensions.
+  @param window Pointer to the StuffyWindow instance (must not be NULL).
+  @param callback Callback function to invoke on resize, or NULL to remove the callback.
+  @note The callback is invoked from the event processing thread, typically during
+        @ref stuffy_app_update calls. The callback should execute quickly to avoid
+        blocking event processing.
+*/
+__STUFFY_API__ void stuffy_window_set_resize_callback (
+  StuffyWindow *window, StuffyWindowResizeCallback callback
+);
 

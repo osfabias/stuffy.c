@@ -4,10 +4,12 @@
 #include <X11/Xlib.h>
 
 #include "stuffy/app.h"
+#include "stuffy/window.h"
 
 #include "src/input/keyboard_state.h"
 #include "src/input/mouse_state.h"
 #include "src/linux/platform_state.h"
+#include "src/linux/window.h"
 
 inline static void process_client_message_event (XClientMessageEvent *event);
 
@@ -64,6 +66,9 @@ void stuffy_app_update (void)
     case ClientMessage :
       process_client_message_event (&event.xclient);
       break;
+    case ConfigureNotify :
+      process_configure_notify_event (&event.xconfigure);
+      break;
     default :
       break;
     }
@@ -111,6 +116,42 @@ void process_client_message_event (XClientMessageEvent *p_event)
       }
     }
     return;
+  }
+}
+
+inline static void process_configure_notify_event (XConfigureEvent *event);
+
+inline static void process_configure_notify_event (XConfigureEvent *event)
+{
+  unsigned char *prop_data = NULL;
+  unsigned long  nitems, bytes_after;
+  int            format;
+  Atom           type;
+
+  if (XGetWindowProperty (event->display,
+        event->window,
+        XInternAtom (g_linux_state.display, WINDOW_BACKLINK_PROPERTY_NAME, False),
+        0,
+        ~0L,
+        False,
+        AnyPropertyType,
+        &type,
+        &format,
+        &nitems,
+        &bytes_after,
+        &prop_data) == Success)
+  {
+    if (prop_data)
+    {
+      StuffyWindow *window = *(StuffyWindow **)prop_data;
+      if (window && window->resize_callback)
+      {
+        window->resize_callback (
+          window, (uint32_t)event->width, (uint32_t)event->height
+        );
+      }
+      XFree (prop_data);
+    }
   }
 }
 

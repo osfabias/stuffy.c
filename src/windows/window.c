@@ -47,6 +47,7 @@ StuffyWindow *stuffy_window_open (const StuffyWindowConfig *config)
 
   window->window_init_style = translate_style_mask (config->style_mask);
   window->should_close      = false;
+  window->resize_callback   = NULL;
 
   return window;
 
@@ -211,5 +212,12 @@ bool is_window_fullscreen (HWND window)
          rect.right == monitor_info.rcMonitor.right &&
          rect.top == monitor_info.rcMonitor.top &&
          rect.bottom == monitor_info.rcMonitor.bottom;
+}
+
+void stuffy_window_set_resize_callback (
+  StuffyWindow *window, StuffyWindowResizeCallback callback)
+{
+  if (window == NULL) { return; }
+  window->resize_callback = callback;
 }
 
