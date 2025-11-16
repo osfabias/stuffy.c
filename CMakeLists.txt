@@ -96,7 +96,6 @@ if(APPLE)
     src/macos/ContentView.m
     src/macos/Window.m
     src/macos/WindowDelegate.m
-    src/macos/Vulkan.m
     # add new macos source files here...
   )
 
@@ -112,7 +111,6 @@ elseif(LINUX)
     ${STUFFY_SOURCE_FILES}
     src/linux/app.c
     src/linux/window.c
-    src/linux/vulkan.c
     # add new linux source files here...
   )
   set(STUFFY_DEPS "")
@@ -121,7 +119,6 @@ elseif(WIN32)
     ${STUFFY_SOURCE_FILES}
     src/windows/app.c
     src/windows/window.c
-    src/windows/vulkan.c
     # add new windows source files here...
   )
   set(STUFFY_DEPS "")

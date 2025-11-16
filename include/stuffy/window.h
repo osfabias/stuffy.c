@@ -229,3 +229,12 @@ __STUFFY_API__ void stuffy_window_set_resize_callback (
 */
 __STUFFY_API__ void
 stuffy_window_set_move_callback (StuffyWindow *window, StuffyWindowMoveCallback callback);
+
+#ifdef __APPLE__
+/*
+  @brief Returns the Metal layer associated with the window.
+  @param window Pointer to the StuffyWindow instance (must not be NULL).
+  @return Pointer to the CAMetalLayer on macOS, NULL on other platforms.
+*/
+__STUFFY_API__ void *stuffy_window_get_metal_layer (StuffyWindow *window);
+#endif

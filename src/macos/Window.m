@@ -284,10 +284,8 @@ CAMetalLayer *stuffy__alloc_metal_layer(ContentView *view) {
   [layer setDrawableSize:drawable_size];
 
   /**
-   * In its implementation of vkGetPhysicalDeviceSurfaceCapabilitiesKHR,
-   * MoltenVK takes into consideration both the size (in points) of the bounds,
-   * and the contentsScale of the CAMetalLayer from which the Vulkan surface was
-   * created. NOTE: See also https://github.com/KhronosGroup/MoltenVK/issues/428
+   * The contentsScale is set to match the window's backing scale factor,
+   * which is important for proper rendering on high-DPI displays (e.g., Retina).
    */
   [layer setContentsScale:view.window.backingScaleFactor];
 
@@ -305,4 +303,11 @@ CAMetalLayer *stuffy__alloc_metal_layer(ContentView *view) {
 
 static float stuffy__transform_y(float value) {
   return CGDisplayBounds(CGMainDisplayID()).size.height - value - 1;
+}
+
+void *stuffy_window_get_metal_layer(StuffyWindow *window) {
+  if (!window) {
+    return NULL;
+  }
+  return (__bridge void *)window->metal_layer;
 }
